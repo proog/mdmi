@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<process version="6.0.002">
+  <context>
+    <input/>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="6.0.002" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="SYSTEM"/>
+    <process expanded="true">
+      <operator activated="true" class="retrieve" compatibility="6.0.002" expanded="true" height="60" name="Retrieve newfooddata (2)" width="90" x="45" y="30">
+        <parameter key="repository_entry" value="../data/newfooddata"/>
+      </operator>
+      <operator activated="true" class="transpose" compatibility="6.0.002" expanded="true" height="76" name="Transpose" width="90" x="179" y="30"/>
+      <operator activated="true" class="subprocess" compatibility="6.0.002" expanded="true" height="76" name="Count missings" width="90" x="313" y="30">
+        <process expanded="true">
+          <operator activated="true" class="generate_aggregation" compatibility="6.0.002" expanded="true" height="76" name="Count non-missings" width="90" x="45" y="30">
+            <parameter key="attribute_name" value="count"/>
+            <parameter key="attribute_filter_type" value="all"/>
+            <parameter key="attribute" value=""/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="true"/>
+            <parameter key="aggregation_function" value="count"/>
+            <parameter key="keep_all" value="true"/>
+            <parameter key="ignore_missings" value="true"/>
+          </operator>
+          <operator activated="true" class="extract_macro" compatibility="6.0.002" expanded="true" height="60" name="Extract attribute count" width="90" x="179" y="30">
+            <parameter key="macro" value="attributes"/>
+            <parameter key="macro_type" value="number_of_attributes"/>
+            <parameter key="statistics" value="average"/>
+            <parameter key="attribute_name" value=""/>
+            <list key="additional_macros"/>
+          </operator>
+          <operator activated="true" class="generate_attributes" compatibility="6.0.002" expanded="true" height="76" name="Compute missings" width="90" x="313" y="30">
+            <list key="function_descriptions">
+              <parameter key="missings" value="parse(macro(&quot;attributes&quot;)) - count"/>
+            </list>
+            <parameter key="use_standard_constants" value="true"/>
+            <parameter key="keep_all" value="true"/>
+          </operator>
+          <operator activated="true" class="select_attributes" compatibility="6.0.002" expanded="true" height="76" name="Remove count" width="90" x="447" y="30">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="count"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="true"/>
+            <parameter key="include_special_attributes" value="false"/>
+          </operator>
+          <connect from_port="in 1" to_op="Count non-missings" to_port="example set input"/>
+          <connect from_op="Count non-missings" from_port="example set output" to_op="Extract attribute count" to_port="example set"/>
+          <connect from_op="Extract attribute count" from_port="example set" to_op="Compute missings" to_port="example set input"/>
+          <connect from_op="Compute missings" from_port="example set output" to_op="Remove count" to_port="example set input"/>
+          <connect from_op="Remove count" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="6.0.002" expanded="true" height="76" name="Remove values with too many missings" width="90" x="447" y="30">
+        <parameter key="parameter_string" value="missings&gt;100"/>
+        <parameter key="parameter_expression" value=""/>
+        <parameter key="condition_class" value="attribute_value_filter"/>
+        <parameter key="invert_filter" value="true"/>
+        <list key="filters_list"/>
+        <parameter key="filters_logic_and" value="true"/>
+      </operator>
+      <operator activated="true" class="select_attributes" compatibility="6.0.002" expanded="true" height="76" name="Remove missings attribute" width="90" x="581" y="30">
+        <parameter key="attribute_filter_type" value="single"/>
+        <parameter key="attribute" value="missings"/>
+        <parameter key="attributes" value=""/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="true"/>
+        <parameter key="include_special_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="transpose" compatibility="6.0.002" expanded="true" height="76" name="Transpose (2)" width="90" x="715" y="30"/>
+      <operator activated="true" class="filter_examples" compatibility="6.0.002" expanded="true" height="76" name="Remove rows with missing attributes" width="90" x="849" y="30">
+        <parameter key="parameter_expression" value=""/>
+        <parameter key="condition_class" value="no_missing_attributes"/>
+        <parameter key="invert_filter" value="false"/>
+        <list key="filters_list"/>
+        <parameter key="filters_logic_and" value="true"/>
+      </operator>
+      <operator activated="true" class="select_attributes" compatibility="6.0.002" expanded="true" height="76" name="Remove attributes not used for classification" width="90" x="45" y="165">
+        <parameter key="attribute_filter_type" value="subset"/>
+        <parameter key="attribute" value="id"/>
+        <parameter key="attributes" value="Food ID|Danish name|Sub group|id"/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="true"/>
+        <parameter key="include_special_attributes" value="true"/>
+      </operator>
+      <operator activated="true" class="set_role" compatibility="6.0.002" expanded="true" height="76" name="Set main group as label and ignore english name" width="90" x="179" y="165">
+        <parameter key="attribute_name" value="English name"/>
+        <parameter key="target_role" value="ignore"/>
+        <list key="set_additional_roles">
+          <parameter key="Main group" value="label"/>
+        </list>
+      </operator>
+      <operator activated="true" class="parse_numbers" compatibility="6.0.002" expanded="true" height="76" name="Convert nominal to numerical" width="90" x="313" y="165">
+        <parameter key="attribute_filter_type" value="all"/>
+        <parameter key="attribute" value=""/>
+        <parameter key="attributes" value="Energy"/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="nominal"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="file_path"/>
+        <parameter key="block_type" value="single_value"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="single_value"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+        <parameter key="decimal_character" value="."/>
+        <parameter key="grouped_digits" value="false"/>
+        <parameter key="grouping_character" value=","/>
+      </operator>
+      <operator activated="true" class="x_validation" compatibility="6.0.002" expanded="true" height="112" name="Validation" width="90" x="849" y="165">
+        <parameter key="create_complete_model" value="false"/>
+        <parameter key="average_performances_only" value="true"/>
+        <parameter key="leave_one_out" value="false"/>
+        <parameter key="number_of_validations" value="10"/>
+        <parameter key="sampling_type" value="stratified sampling"/>
+        <parameter key="use_local_random_seed" value="false"/>
+        <parameter key="local_random_seed" value="1992"/>
+        <process expanded="true">
+          <operator activated="true" class="k_nn" compatibility="6.0.002" expanded="true" height="76" name="k-NN" width="90" x="179" y="30">
+            <parameter key="k" value="5"/>
+            <parameter key="weighted_vote" value="false"/>
+            <parameter key="measure_types" value="NumericalMeasures"/>
+            <parameter key="mixed_measure" value="MixedEuclideanDistance"/>
+            <parameter key="nominal_measure" value="NominalDistance"/>
+            <parameter key="numerical_measure" value="EuclideanDistance"/>
+            <parameter key="divergence" value="GeneralizedIDivergence"/>
+            <parameter key="kernel_type" value="radial"/>
+            <parameter key="kernel_gamma" value="1.0"/>
+            <parameter key="kernel_sigma1" value="1.0"/>
+            <parameter key="kernel_sigma2" value="0.0"/>
+            <parameter key="kernel_sigma3" value="2.0"/>
+            <parameter key="kernel_degree" value="3.0"/>
+            <parameter key="kernel_shift" value="1.0"/>
+            <parameter key="kernel_a" value="1.0"/>
+            <parameter key="kernel_b" value="0.0"/>
+          </operator>
+          <connect from_port="training" to_op="k-NN" to_port="training set"/>
+          <connect from_op="k-NN" from_port="model" to_port="model"/>
+          <portSpacing port="source_training" spacing="0"/>
+          <portSpacing port="sink_model" spacing="0"/>
+          <portSpacing port="sink_through 1" spacing="0"/>
+        </process>
+        <process expanded="true">
+          <operator activated="true" class="apply_model" compatibility="6.0.002" expanded="true" height="76" name="Apply Model" width="90" x="112" y="30">
+            <list key="application_parameters"/>
+            <parameter key="create_view" value="false"/>
+          </operator>
+          <operator activated="true" class="performance" compatibility="6.0.002" expanded="true" height="76" name="Performance" width="90" x="313" y="30">
+            <parameter key="use_example_weights" value="true"/>
+          </operator>
+          <connect from_port="model" to_op="Apply Model" to_port="model"/>
+          <connect from_port="test set" to_op="Apply Model" to_port="unlabelled data"/>
+          <connect from_op="Apply Model" from_port="labelled data" to_op="Performance" to_port="labelled data"/>
+          <connect from_op="Performance" from_port="performance" to_port="averagable 1"/>
+          <portSpacing port="source_model" spacing="0"/>
+          <portSpacing port="source_test set" spacing="0"/>
+          <portSpacing port="source_through 1" spacing="0"/>
+          <portSpacing port="sink_averagable 1" spacing="0"/>
+          <portSpacing port="sink_averagable 2" spacing="0"/>
+        </process>
+      </operator>
+      <connect from_op="Retrieve newfooddata (2)" from_port="output" to_op="Transpose" to_port="example set input"/>
+      <connect from_op="Transpose" from_port="example set output" to_op="Count missings" to_port="in 1"/>
+      <connect from_op="Count missings" from_port="out 1" to_op="Remove values with too many missings" to_port="example set input"/>
+      <connect from_op="Remove values with too many missings" from_port="example set output" to_op="Remove missings attribute" to_port="example set input"/>
+      <connect from_op="Remove missings attribute" from_port="example set output" to_op="Transpose (2)" to_port="example set input"/>
+      <connect from_op="Transpose (2)" from_port="example set output" to_op="Remove rows with missing attributes" to_port="example set input"/>
+      <connect from_op="Remove rows with missing attributes" from_port="example set output" to_op="Remove attributes not used for classification" to_port="example set input"/>
+      <connect from_op="Remove attributes not used for classification" from_port="example set output" to_op="Set main group as label and ignore english name" to_port="example set input"/>
+      <connect from_op="Set main group as label and ignore english name" from_port="example set output" to_op="Convert nominal to numerical" to_port="example set input"/>
+      <connect from_op="Convert nominal to numerical" from_port="example set output" to_op="Validation" to_port="training"/>
+      <connect from_op="Validation" from_port="model" to_port="result 1"/>
+      <connect from_op="Validation" from_port="training" to_port="result 3"/>
+      <connect from_op="Validation" from_port="averagable 1" to_port="result 2"/>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+      <portSpacing port="sink_result 2" spacing="0"/>
+      <portSpacing port="sink_result 3" spacing="0"/>
+      <portSpacing port="sink_result 4" spacing="0"/>
+    </process>
+  </operator>
+</process>
