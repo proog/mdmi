@@ -17,9 +17,9 @@
         <parameter key="repository_entry" value="../data/newfooddata"/>
       </operator>
       <operator activated="true" class="transpose" compatibility="6.0.002" expanded="true" height="76" name="Transpose" width="90" x="179" y="30"/>
-      <operator activated="true" class="subprocess" compatibility="6.0.002" expanded="true" height="76" name="Count missings" width="90" x="313" y="30">
+      <operator activated="true" class="subprocess" compatibility="6.0.002" expanded="true" height="76" name="Missing Count" width="90" x="313" y="30">
         <process expanded="true">
-          <operator activated="true" class="generate_aggregation" compatibility="6.0.002" expanded="true" height="76" name="Count non-missings" width="90" x="45" y="30">
+          <operator activated="true" class="generate_aggregation" compatibility="6.0.002" expanded="true" height="76" name="present data" width="90" x="45" y="30">
             <parameter key="attribute_name" value="count"/>
             <parameter key="attribute_filter_type" value="all"/>
             <parameter key="attribute" value=""/>
@@ -38,15 +38,15 @@
             <parameter key="ignore_missings" value="true"/>
           </operator>
           <operator activated="true" class="extract_macro" compatibility="6.0.002" expanded="true" height="60" name="Extract attribute count" width="90" x="179" y="30">
-            <parameter key="macro" value="attributes"/>
+            <parameter key="macro" value="attr"/>
             <parameter key="macro_type" value="number_of_attributes"/>
             <parameter key="statistics" value="average"/>
             <parameter key="attribute_name" value=""/>
             <list key="additional_macros"/>
           </operator>
-          <operator activated="true" class="generate_attributes" compatibility="6.0.002" expanded="true" height="76" name="Compute missings" width="90" x="313" y="30">
+          <operator activated="true" class="generate_attributes" compatibility="6.0.002" expanded="true" height="76" name="find missing values" width="90" x="313" y="30">
             <list key="function_descriptions">
-              <parameter key="missings" value="parse(macro(&quot;attributes&quot;)) - count"/>
+              <parameter key="missing" value="parse(macro(&quot;attr&quot;)) - count"/>
             </list>
             <parameter key="use_standard_constants" value="true"/>
             <parameter key="keep_all" value="true"/>
@@ -65,10 +65,10 @@
             <parameter key="invert_selection" value="true"/>
             <parameter key="include_special_attributes" value="false"/>
           </operator>
-          <connect from_port="in 1" to_op="Count non-missings" to_port="example set input"/>
-          <connect from_op="Count non-missings" from_port="example set output" to_op="Extract attribute count" to_port="example set"/>
-          <connect from_op="Extract attribute count" from_port="example set" to_op="Compute missings" to_port="example set input"/>
-          <connect from_op="Compute missings" from_port="example set output" to_op="Remove count" to_port="example set input"/>
+          <connect from_port="in 1" to_op="present data" to_port="example set input"/>
+          <connect from_op="present data" from_port="example set output" to_op="Extract attribute count" to_port="example set"/>
+          <connect from_op="Extract attribute count" from_port="example set" to_op="find missing values" to_port="example set input"/>
+          <connect from_op="find missing values" from_port="example set output" to_op="Remove count" to_port="example set input"/>
           <connect from_op="Remove count" from_port="example set output" to_port="out 1"/>
           <portSpacing port="source_in 1" spacing="0"/>
           <portSpacing port="source_in 2" spacing="0"/>
@@ -77,7 +77,7 @@
         </process>
       </operator>
       <operator activated="true" class="filter_examples" compatibility="6.0.002" expanded="true" height="76" name="Remove values with too many missings" width="90" x="447" y="30">
-        <parameter key="parameter_string" value="missings&gt;100"/>
+        <parameter key="parameter_string" value="missing&gt;100"/>
         <parameter key="parameter_expression" value=""/>
         <parameter key="condition_class" value="attribute_value_filter"/>
         <parameter key="invert_filter" value="true"/>
@@ -86,7 +86,7 @@
       </operator>
       <operator activated="true" class="select_attributes" compatibility="6.0.002" expanded="true" height="76" name="Remove missings attribute" width="90" x="581" y="30">
         <parameter key="attribute_filter_type" value="single"/>
-        <parameter key="attribute" value="missings"/>
+        <parameter key="attribute" value="missing"/>
         <parameter key="attributes" value=""/>
         <parameter key="use_except_expression" value="false"/>
         <parameter key="value_type" value="attribute_value"/>
@@ -154,7 +154,7 @@
         <parameter key="local_random_seed" value="1992"/>
         <process expanded="true">
           <operator activated="true" class="k_nn" compatibility="6.0.002" expanded="true" height="76" name="k-NN" width="90" x="179" y="30">
-            <parameter key="k" value="5"/>
+            <parameter key="k" value="3"/>
             <parameter key="weighted_vote" value="false"/>
             <parameter key="measure_types" value="NumericalMeasures"/>
             <parameter key="mixed_measure" value="MixedEuclideanDistance"/>
@@ -197,8 +197,8 @@
         </process>
       </operator>
       <connect from_op="Retrieve newfooddata (2)" from_port="output" to_op="Transpose" to_port="example set input"/>
-      <connect from_op="Transpose" from_port="example set output" to_op="Count missings" to_port="in 1"/>
-      <connect from_op="Count missings" from_port="out 1" to_op="Remove values with too many missings" to_port="example set input"/>
+      <connect from_op="Transpose" from_port="example set output" to_op="Missing Count" to_port="in 1"/>
+      <connect from_op="Missing Count" from_port="out 1" to_op="Remove values with too many missings" to_port="example set input"/>
       <connect from_op="Remove values with too many missings" from_port="example set output" to_op="Remove missings attribute" to_port="example set input"/>
       <connect from_op="Remove missings attribute" from_port="example set output" to_op="Transpose (2)" to_port="example set input"/>
       <connect from_op="Transpose (2)" from_port="example set output" to_op="Remove rows with missing attributes" to_port="example set input"/>
