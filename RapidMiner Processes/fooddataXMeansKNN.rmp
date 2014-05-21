@@ -13,8 +13,8 @@
     <parameter key="process_duration_for_mail" value="30"/>
     <parameter key="encoding" value="SYSTEM"/>
     <process expanded="true">
-      <operator activated="true" class="retrieve" compatibility="6.0.002" expanded="true" height="60" name="Retrieve newfooddata (2)" width="90" x="45" y="30">
-        <parameter key="repository_entry" value="../data/newfooddata"/>
+      <operator activated="true" class="retrieve" compatibility="6.0.002" expanded="true" height="60" name="Retrieve fooddatafinal" width="90" x="45" y="30">
+        <parameter key="repository_entry" value="../data/fooddatafinal"/>
       </operator>
       <operator activated="true" class="transpose" compatibility="6.0.002" expanded="true" height="76" name="Transpose" width="90" x="179" y="30"/>
       <operator activated="true" class="subprocess" compatibility="6.0.002" expanded="true" height="76" name="Missing Count" width="90" x="313" y="30">
@@ -243,7 +243,7 @@
           <portSpacing port="sink_averagable 2" spacing="0"/>
         </process>
       </operator>
-      <connect from_op="Retrieve newfooddata (2)" from_port="output" to_op="Transpose" to_port="example set input"/>
+      <connect from_op="Retrieve fooddatafinal" from_port="output" to_op="Transpose" to_port="example set input"/>
       <connect from_op="Transpose" from_port="example set output" to_op="Missing Count" to_port="in 1"/>
       <connect from_op="Missing Count" from_port="out 1" to_op="Remove values with too many missings" to_port="example set input"/>
       <connect from_op="Remove values with too many missings" from_port="example set output" to_op="Remove missings attribute" to_port="example set input"/>
