@@ -69,6 +69,10 @@ public class Clustering {
         
         // add all entries to the nearest cluster
         for(Entry e : entries) {
+            /*if(kInitial.contains(e)) {
+                continue;
+            }*/
+            
             Cluster bestCluster = clusters.get(0);
             for(Cluster c : clusters) {
                 if(distance(e, c.mean()) <= distance(e, bestCluster.mean()))
